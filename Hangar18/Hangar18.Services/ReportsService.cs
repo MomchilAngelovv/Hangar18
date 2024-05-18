@@ -5,6 +5,7 @@ namespace Hangar18.Services;
 public class ReportsService
 {
 	private readonly PalletsService _palletsService;
+	private int nestedLevelCounter = 1;
 
 	public ReportsService(
 		PalletsService palletsService)
@@ -22,21 +23,24 @@ public class ReportsService
 
 			foreach (var box in pallet.Boxes)
 			{
-                await Console.Out.WriteLineAsync($"    {box.Id}");
-            }
-        }
+				await PrintBoxInfoAsync(box);
+				nestedLevelCounter = 1;
+			}
+		}
 	}
 
 	private async Task PrintBoxInfoAsync(Box box)
 	{
-		if (box.Boxes.Count != 0)
+		await Console.Out.WriteLineAsync($"{new string(' ', nestedLevelCounter * 4)}{box.Id}");
+
+		if (box.Boxes is not null && box.Boxes.Count != 0)
 		{
+			nestedLevelCounter++;
+
 			foreach (var innerBox in box.Boxes)
 			{
 				await PrintBoxInfoAsync(innerBox);
 			}
 		}
-
-		await Console.Out.WriteLineAsync($"    {box.Id}");
 	}
 }
