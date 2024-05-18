@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Hangar18.Data\Hangar18.Data.csproj" />
+  </ItemGroup>
+
 </Project>
