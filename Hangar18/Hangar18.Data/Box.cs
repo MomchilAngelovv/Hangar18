@@ -5,11 +5,9 @@ namespace Hangar18.Data;
 
 public class Box
 {
-    public Box(string id, string palletId)
+    public Box(string id)
     {
         Id = id;
-        PalletId = palletId;
-
 	}
 
     [Key]
@@ -17,6 +15,6 @@ public class Box
 
     public string? ParentBoxId { get; set; }
     public virtual Box ParentBox { get; set; }
-    public string PalletId { get; set; }
+    public string? PalletId { get; set; }
     public virtual Pallet Pallet { get; set; }
 }

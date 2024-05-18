@@ -16,8 +16,8 @@ public class BoxesService
 		_logger = logger;
 	}
 
-	public async Task<Box> CreateBoxAsync(string id, string palletId)
-	{
+	public async Task<Box> CreateBoxAsync(string id)
+	{ 
 		var existingBox = await _db.Boxes.AnyAsync(x => x.Id == id);
 		if (existingBox)
 		{
@@ -25,18 +25,35 @@ public class BoxesService
 			return null;
 		}
 
-		var existingPallet = await _db.Pallets.AnyAsync(x => x.Id == palletId);
-		if (!existingPallet)
-		{
-			_logger.LogMessage($"Cannot find pallet with Id: {palletId}");
-			return null;
-		}
-
-		var box = new Box(id, palletId);
+		var box = new Box(id);
 
 		await _db.Boxes.AddAsync(box);
 		await _db.SaveChangesAsync();
 
 		return box;
+	}
+
+	public async Task<Box> AddBoxesToBoxAsync(string id, params Box[] boxes)
+	{
+		var existingBox = await _db.Boxes.FirstOrDefaultAsync(x => x.Id == id);
+		if (existingBox is null)
+		{
+			_logger.LogMessage($"Cannot find the box with id: {id}");
+			return null;
+		}
+
+		foreach (var box in boxes)
+		{
+			box.ParentBoxId = existingBox.Id;
+		}
+
+		await _db.SaveChangesAsync();
+
+		return existingBox;
+	}
+
+	public async Task<List<Box>> GetManyAsync()
+	{
+		return await _db.Boxes.ToListAsync();
 	}
 }

@@ -54,6 +54,6 @@ public class PalletsService
 
 	public async Task<List<Pallet>> GetManyAsync()
 	{
-		return await _db.Pallets.ToListAsync();
+		return await _db.Pallets.Include(p => p.Boxes).ToListAsync();
 	}
 }

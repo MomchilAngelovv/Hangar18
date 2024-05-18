@@ -5,17 +5,20 @@ Console.WriteLine("Welcome to Hangar 18 - your warehouse from the future!");
 
 var db = new Hangar18DdContext();
 var logger = new Logger();
-var palletsService = new PalletsService(db, logger);
+
 var boxesService = new BoxesService(db, logger);
+var palletsService = new PalletsService(db, logger);
+var dataSeeder = new DataSeeder(db, boxesService, palletsService, logger);
+var reportsService = new ReportsService(palletsService);
 
-var createdPallet = await palletsService.CreatePalletAsync("Pallet P1");
-var box1 = await boxesService.CreateBoxAsync("Box 'BC1'", createdPallet.Id);
-var box2 = await boxesService.CreateBoxAsync("Box 'BC2'", createdPallet.Id);
-
-await palletsService.AddBoxesToPalletAsync(createdPallet.Id, box1, box2);
+await dataSeeder.SeedDataAsync();
 
 var allPallets = await palletsService.GetManyAsync();
-;
+var allBoxes = await boxesService.GetManyAsync();
+
+await palletsService.AddBoxesToPalletAsync(allPallets[0].Id, allBoxes[0], allBoxes[3]);
+
+await reportsService.PrintWarehouseReportAsync();
 
 
 
