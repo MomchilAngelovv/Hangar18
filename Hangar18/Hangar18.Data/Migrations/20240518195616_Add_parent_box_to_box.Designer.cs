@@ -3,6 +3,7 @@ using Hangar18.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hangar18.Data.Migrations
 {
     [DbContext(typeof(Hangar18DdContext))]
-    partial class Hangar18DdContextModelSnapshot : ModelSnapshot
+    [Migration("20240518195616_Add_parent_box_to_box")]
+    partial class Add_parent_box_to_box
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

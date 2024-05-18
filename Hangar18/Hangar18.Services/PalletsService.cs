@@ -33,6 +33,25 @@ public class PalletsService
 		return pallet;
 	}
 
+	public async Task<Pallet> AddBoxesToPalletAsync(string id, params Box[] boxes)
+	{
+		var existingPallet = await _db.Pallets.Include(b => b.Boxes).FirstOrDefaultAsync(x => x.Id == id);
+		if (existingPallet is null)
+		{
+			_logger.LogMessage($"Cannot find the pallet with id: {id}");
+			return null;
+		}
+
+		foreach (var box in boxes)
+		{
+			existingPallet.Boxes.Add(box);
+		}
+
+		await _db.SaveChangesAsync();
+
+		return existingPallet;
+	}
+
 	public async Task<List<Pallet>> GetManyAsync()
 	{
 		return await _db.Pallets.ToListAsync();
