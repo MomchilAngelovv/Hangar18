@@ -1,4 +1,6 @@
-﻿namespace Hangar18.Services;
+﻿using Hangar18.Data;
+
+namespace Hangar18.Services;
 
 public class ReportsService
 {
@@ -23,5 +25,18 @@ public class ReportsService
                 await Console.Out.WriteLineAsync($"    {box.Id}");
             }
         }
+	}
+
+	private async Task PrintBoxInfoAsync(Box box)
+	{
+		if (box.Boxes.Count != 0)
+		{
+			foreach (var innerBox in box.Boxes)
+			{
+				await PrintBoxInfoAsync(innerBox);
+			}
+		}
+
+		await Console.Out.WriteLineAsync($"    {box.Id}");
 	}
 }

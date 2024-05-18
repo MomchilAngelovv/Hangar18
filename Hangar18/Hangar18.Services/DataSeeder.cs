@@ -22,7 +22,7 @@ public class DataSeeder
 	}
 
 	/// <summary>
-	/// This will seed 2 pallets and 10 boxes 
+	/// This will seed 2 pallets and 7 boxes 
 	/// </summary>
 	/// <returns></returns>
 	public async Task SeedDataAsync()
@@ -32,7 +32,7 @@ public class DataSeeder
 			_logger.LogMessage($"Database is not empty");
 		}
 
-		for (int i = 1; i <= 10; i++)
+		for (int i = 1; i <= 7; i++)
 		{
 		    await _boxesService.CreateBoxAsync($"Box 'BC{i}'");
 		}

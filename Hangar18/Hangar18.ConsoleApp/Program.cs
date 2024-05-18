@@ -17,9 +17,12 @@ var allPallets = await palletsService.GetManyAsync();
 var allBoxes = await boxesService.GetManyAsync();
 
 await palletsService.AddBoxesToPalletAsync(allPallets[0].Id, allBoxes[0], allBoxes[3]);
+await boxesService.AddBoxesToBoxAsync(allBoxes[0].Id, allBoxes[1], allBoxes[2]);
+await boxesService.AddBoxesToBoxAsync(allBoxes[4].Id, allBoxes[4], allBoxes[5], allBoxes[6]);
 
 await reportsService.PrintWarehouseReportAsync();
 
-
+var allPallet2s = await palletsService.GetManyAsync();
+;
 
 

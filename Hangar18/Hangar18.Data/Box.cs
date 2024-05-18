@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hangar18.Data;
 
@@ -17,4 +16,6 @@ public class Box
     public virtual Box ParentBox { get; set; }
     public string? PalletId { get; set; }
     public virtual Pallet Pallet { get; set; }
+
+    public virtual ICollection<Box> Boxes { get; set; }
 }
