@@ -69,10 +69,10 @@ public class PalletsService
 		if (box is null)
 		{
 			_logger.LogMessage($"Cannot find box with id: {boxId} to remove it.");
-			return; 
+			return;
 		}
 
-		_logger.LogMessage($"Removing box with Id: {boxId} and all of its nested boxes (if any) from pallet");
+		_logger.LogMessage($"Removing box with Id: {boxId} and all previous (if any) and nested (if any) boxes from pallet");
 
 		var removedBoxes = new List<Box>
 		{
@@ -115,14 +115,9 @@ public class PalletsService
 	{
 		var boxes = new List<Box>();
 
-		while (box.Boxes is not null && box.Boxes.Count > 0)
+		if (box.Boxes is not null)
 		{
 			boxes.AddRange(box.Boxes);
-
-			foreach (var boxToRemove in box.Boxes)
-			{
-				await AddBoxForRemovalAsync(box);
-			}
 		}
 
 		return boxes;
