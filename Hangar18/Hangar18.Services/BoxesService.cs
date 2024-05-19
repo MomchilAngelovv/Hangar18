@@ -2,6 +2,7 @@
 using Hangar18.Data.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Update.Internal;
+using System.Globalization;
 
 namespace Hangar18.Services;
 
@@ -18,21 +19,25 @@ public class BoxesService
 		_logger = logger;
 	}
 
-	public async Task<Box> CreateBoxAsync(string id)
+	public async Task<List<Box>> CreateBoxesAsync(List<string> ids)
 	{
-		var existingBox = await _db.Boxes.AnyAsync(x => x.Id == id);
+		var existingBox = await _db.Boxes.AnyAsync(b => ids.Contains(b.Id));
 		if (existingBox)
 		{
-			_logger.LogMessage($"There is already Box Id: {id}");
+			_logger.LogMessage($"There is already existing box with at least one given Id");
 			return null;
 		}
 
-		var box = new Box(id);
+		var boxes = new List<Box>();
+		foreach (var id in ids)
+		{
+			boxes.Add(new Box(id));
+		}
 
-		await _db.Boxes.AddAsync(box);
+		await _db.Boxes.AddRangeAsync(boxes);
 		await _db.SaveChangesAsync();
 
-		return box;
+		return boxes;
 	}
 
 	public async Task<Box> AddBoxesToBoxAsync(string id, params Box[] boxes)

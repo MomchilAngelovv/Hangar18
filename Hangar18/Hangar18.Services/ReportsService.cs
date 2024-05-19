@@ -23,7 +23,7 @@ public class ReportsService
 		_logger.LogMessage("Pallets status report:");
 		foreach (var pallet in allPallets)
 		{
-			await Console.Out.WriteLineAsync($"{pallet.Id}");
+			_logger.LogMessage($"{pallet.Id}");
 
 			foreach (var box in pallet.Boxes)
 			{
@@ -35,7 +35,7 @@ public class ReportsService
 
 	private async Task PrintBoxInfoAsync(Box box)
 	{
-		await Console.Out.WriteLineAsync($"{new string(' ', nestedLevelCounter * 4)}{box.Id}");
+		_logger.LogMessage($"{new string(' ', nestedLevelCounter * 4)}{box.Id}");
 
 		if (box.Boxes is not null && box.Boxes.Count != 0)
 		{

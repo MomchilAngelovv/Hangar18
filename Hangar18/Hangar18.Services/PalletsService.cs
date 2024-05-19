@@ -22,21 +22,25 @@ public class PalletsService
 		_logger = logger;
 	}
 
-	public async Task<Pallet> CreatePalletAsync(string id)
+	public async Task<List<Pallet>> CreatePalletsAsync(List<string> ids)
 	{
-		var existingPallet = await _db.Pallets.AnyAsync(x => x.Id == id);
+		var existingPallet = await _db.Pallets.AnyAsync(b => ids.Contains(b.Id));
 		if (existingPallet)
 		{
-			_logger.LogMessage("There is already Pallet with this Id");
+			_logger.LogMessage($"There is already existing pallet with at least one given Id");
 			return null;
 		}
 
-		var pallet = new Pallet(id);
+		var pallets = new List<Pallet>();
+		foreach (var id in ids)
+		{
+			pallets.Add(new Pallet(id));
+		}
 
-		await _db.Pallets.AddAsync(pallet);
+		await _db.Pallets.AddRangeAsync(pallets);
 		await _db.SaveChangesAsync();
 
-		return pallet;
+		return pallets;
 	}
 
 	public async Task<Pallet> AddBoxesToPalletAsync(string id, params Box[] boxes)

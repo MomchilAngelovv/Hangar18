@@ -23,25 +23,30 @@ public class DataSeeder
 
 	public async Task SeedDataAsync()
 	{
-		if (_db.Pallets.Any())
-		{
-			_logger.LogMessage($"Database is not empty");
-			return;
-		}
-		
-		//TODO: at the end make it bulk operation
+		var boxIds = new List<string>();
 		for (int i = 1; i <= 9; i++)
 		{
-		    await _boxesService.CreateBoxAsync($"Box{i}");
+			boxIds.Add($"Box{i}");
 		}
 
+		await _boxesService.CreateBoxesAsync(boxIds);
+
+		var palletIds = new List<string>();
 		for (int i = 1; i <= 3; i++)
 		{
-			await _palletsService.CreatePalletAsync($"Pallet{i}");
+			palletIds.Add($"Pallet{i}");
 		}
+
+		await _palletsService.CreatePalletsAsync(palletIds);
 
 		var allPallets = await _palletsService.GetManyAsync();
 		var allBoxes = await _boxesService.GetManyAsync();
+
+		if (allBoxes.Count == 0 || allBoxes.Count == 0)
+		{
+			_logger.LogMessage("Database is not empty. Aborting seeding");
+			return;
+		}
 
 		//Pallet 1
 		await _palletsService.AddBoxesToPalletAsync(allPallets[0].Id, allBoxes[0], allBoxes[1]);
