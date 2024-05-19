@@ -1,5 +1,6 @@
 ﻿using Hangar18.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Update.Internal;
 
 namespace Hangar18.Services;
 
@@ -50,6 +51,11 @@ public class BoxesService
 		await _db.SaveChangesAsync();
 
 		return existingBox;
+	}
+
+	public async Task<Box> GetOneAsync(string id)
+	{
+		return await _db.Boxes.FirstOrDefaultAsync(b => b.Id == id);
 	}
 
 	public async Task<List<Box>> GetManyAsync()

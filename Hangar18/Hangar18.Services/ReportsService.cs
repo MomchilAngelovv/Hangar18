@@ -1,22 +1,26 @@
 ﻿using Hangar18.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Hangar18.Services;
 
 public class ReportsService
 {
 	private readonly PalletsService _palletsService;
+	private readonly Logger _logger;
 	private int nestedLevelCounter = 1;
 
 	public ReportsService(
-		PalletsService palletsService)
+		PalletsService palletsService,
+		Logger logger)
 	{
 		_palletsService = palletsService;
+		_logger = logger;
 	}
 
 	public async Task PrintWarehouseReportAsync()
 	{
 		var allPallets = await _palletsService.GetManyAsync();
-
+		_logger.LogMessage("Pallets status report:");
 		foreach (var pallet in allPallets)
 		{
 			await Console.Out.WriteLineAsync($"{pallet.Id}");

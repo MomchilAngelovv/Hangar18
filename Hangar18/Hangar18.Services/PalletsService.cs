@@ -1,18 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Hangar18.Data;
+using System.Runtime.InteropServices;
 
 namespace Hangar18.Services;
 
 public class PalletsService
 {
 	private readonly Hangar18DdContext _db;
+	private readonly BoxesService _boxesService;
 	private readonly Logger _logger;
 
 	public PalletsService(
 		Hangar18DdContext db,
+		BoxesService boxesService,
 		Logger logger)
 	{
 		_db = db;
+		_boxesService = boxesService;
 		_logger = logger;
 	}
 
@@ -50,6 +54,20 @@ public class PalletsService
 		await _db.SaveChangesAsync();
 
 		return existingPallet;
+	}
+
+	public async Task OpenBoxAsync(string boxId)
+	{
+		var box = await _boxesService.GetOneAsync(boxId);
+
+		if (box is null)
+		{
+			_logger.LogMessage($"Cannot find box with id: {boxId} to remove it.");
+			return; 
+		}
+
+		box.Pallet = null;
+		await _db.SaveChangesAsync();
 	}
 
 	public async Task<List<Pallet>> GetManyAsync()

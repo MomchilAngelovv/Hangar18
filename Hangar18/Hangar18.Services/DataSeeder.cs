@@ -26,17 +26,18 @@ public class DataSeeder
 		if (_db.Pallets.Any())
 		{
 			_logger.LogMessage($"Database is not empty");
+			return;
 		}
 		
 		//TODO: at the end make it bulk operation
 		for (int i = 1; i <= 9; i++)
 		{
-		    await _boxesService.CreateBoxAsync($"Box 'BC{i}'");
+		    await _boxesService.CreateBoxAsync($"Box{i}");
 		}
 
 		for (int i = 1; i <= 3; i++)
 		{
-			await _palletsService.CreatePalletAsync($"Pallet P{i}");
+			await _palletsService.CreatePalletAsync($"Pallet{i}");
 		}
 
 		var allPallets = await _palletsService.GetManyAsync();
@@ -52,7 +53,6 @@ public class DataSeeder
 		await _palletsService.AddBoxesToPalletAsync(allPallets[1].Id, allBoxes[8]);
 
 		//Palet 3 - empty
-
 		_logger.LogMessage($"Database seeded successfully");
 	}
 }
