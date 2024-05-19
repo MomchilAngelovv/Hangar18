@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Hangar18.Data;
 using System.Runtime.InteropServices;
+using System.Globalization;
+using Microsoft.IdentityModel.Abstractions;
 
 namespace Hangar18.Services;
 
@@ -56,7 +58,7 @@ public class PalletsService
 		return existingPallet;
 	}
 
-	public async Task OpenBoxAsync(string boxId)
+	public async Task TakeBoxAsync(string boxId)
 	{
 		var box = await _boxesService.GetOneAsync(boxId);
 
@@ -66,18 +68,37 @@ public class PalletsService
 			return; 
 		}
 
-		if (box.ParentBox is null && box.Pallet is not null)
+		var openedBoxes = new List<Box>();
+		var boxesToPutBackOnPallet = new List<Box>();
+		var palletId = string.Empty;
+
+		if (box.Boxes is not null && box.Boxes.Count > 0)
 		{
-			box.Pallet = null;
-			await _db.SaveChangesAsync();
-			return;
+			openedBoxes.AddRange(box.Boxes);
 		}
 
-		var boxesToLeaveOnPallet = new List<Box>();
+		while (box.Pallet is null)
+		{
+			if (box.ParentBoxId is not null)
+			{
+				openedBoxes.Add(box.ParentBox);
+				boxesToPutBackOnPallet.AddRange(box.ParentBox.Boxes.Where(b => b.Id != boxId).Except(openedBoxes));
+			}
+
+			box = await _boxesService.GetOneAsync(box.ParentBox.Id);
+		}
+
+		palletId = box.Pallet.Id;
+		openedBoxes.Add(box);
+
+		await AddBoxesToPalletAsync(palletId, [.. boxesToPutBackOnPallet]);
+		await _boxesService.DestroyOpenedBoxesAsync([.. openedBoxes]);
 	}
 
 	public async Task<List<Pallet>> GetManyAsync()
 	{
 		return await _db.Pallets.Include(p => p.Boxes).ThenInclude(b => b.Boxes).ToListAsync();
 	}
+
+	
 }

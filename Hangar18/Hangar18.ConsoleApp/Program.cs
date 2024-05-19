@@ -33,7 +33,7 @@ while (true)
 
 	foreach (var boxId in boxIds)
 	{
-		await palletsService.OpenBoxAsync(boxId);
+		await palletsService.TakeBoxAsync(boxId);
 	}
 
 	await reportsService.PrintWarehouseReportAsync();

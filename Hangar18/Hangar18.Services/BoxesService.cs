@@ -19,7 +19,7 @@ public class BoxesService
 	}
 
 	public async Task<Box> CreateBoxAsync(string id)
-	{ 
+	{
 		var existingBox = await _db.Boxes.AnyAsync(x => x.Id == id);
 		if (existingBox)
 		{
@@ -56,11 +56,17 @@ public class BoxesService
 
 	public async Task<Box> GetOneAsync(string id)
 	{
-		return await _db.Boxes.FirstOrDefaultAsync(b => b.Id == id);
+		return await _db.Boxes.Include(b => b.Pallet).FirstOrDefaultAsync(b => b.Id == id);
 	}
 
 	public async Task<List<Box>> GetManyAsync()
 	{
 		return await _db.Boxes.ToListAsync();
+	}
+
+	public async Task DestroyOpenedBoxesAsync(params Box[] boxes)
+	{
+		_db.Boxes.RemoveRange(boxes);
+		await _db.SaveChangesAsync();
 	}
 }
