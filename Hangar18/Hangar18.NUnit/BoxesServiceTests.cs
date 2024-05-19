@@ -28,8 +28,7 @@ public class BoxesServiceTests
 		using var _db = new Hangar18DdContext(_options);
 		_sut = new BoxesService(_db, _logger);
 
-		var ids = new List<string> { "Test1", "Test2" };
-
+		var ids = new List<string> { "TestBox1", "TestBox2" };
 
 		await _sut.CreateBoxesAsync(ids);
 
@@ -37,5 +36,22 @@ public class BoxesServiceTests
 
 		Assert.That(boxes.Select(b => b.Id).All(ids.Contains), Is.True);
 		Assert.That(boxes, Has.Count.EqualTo(2));
+	}
+
+	[Test]
+	public async Task CreateBoxesAsync_Should_Not_Create_If_Already_Even_Single_One_Exists()
+	{
+		using var _db = new Hangar18DdContext(_options);
+		_sut = new BoxesService(_db, _logger);
+
+		var ids = new List<string> { "TestBox1", "TestBox2" };
+
+		await _sut.CreateBoxesAsync(ids);
+		
+		ids = ["TestBox2", "TestBox3"];
+
+		var creaedBoxes = await _sut.CreateBoxesAsync(ids);
+
+		Assert.That(creaedBoxes, Is.Null);
 	}
 }

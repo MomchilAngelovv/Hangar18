@@ -52,7 +52,7 @@ public class PalletsService
 			return null;
 		}
 
-		foreach (var box in boxes)
+		foreach (var box in boxes.DistinctBy(b => b.Id))
 		{
 			existingPallet.Boxes.Add(box);
 		}

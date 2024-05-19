@@ -47,8 +47,8 @@ public class DataSeeder
 
 		//Pallet 1
 		await _palletsService.AddBoxesToPalletAsync(allPallets[0].Id, allBoxes[0], allBoxes[1]);
-		await _boxesService.AddBoxesToBoxAsync(allBoxes[0].Id, allBoxes[2], allBoxes[3], allBoxes[4]);
-		await _boxesService.AddBoxesToBoxAsync(allBoxes[1].Id, allBoxes[5]);
+		await _boxesService.AddBoxesToBoxAsync(allBoxes[0].Id, allBoxes[2], allBoxes[3]);
+		await _boxesService.AddBoxesToBoxAsync(allBoxes[1].Id, allBoxes[4], allBoxes[5]);
 		await _boxesService.AddBoxesToBoxAsync(allBoxes[5].Id, allBoxes[6], allBoxes[7]);
 
 		//Palet 2
