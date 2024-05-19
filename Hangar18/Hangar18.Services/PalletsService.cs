@@ -68,37 +68,62 @@ public class PalletsService
 			return; 
 		}
 
-		var openedBoxes = new List<Box>();
-		var boxesToPutBackOnPallet = new List<Box>();
+		var removedBoxes = new List<Box>
+		{
+			box
+		};
+
+		var newPalletBoxes = new List<Box>();
+
 		var palletId = string.Empty;
 
 		if (box.Boxes is not null && box.Boxes.Count > 0)
 		{
-			openedBoxes.AddRange(box.Boxes);
+			foreach (var boxToRemove in box.Boxes)
+			{
+				removedBoxes.AddRange(await AddBoxForRemovalAsync(boxToRemove));
+			}
+
+			removedBoxes.AddRange(box.Boxes);
 		}
 
 		while (box.Pallet is null)
 		{
 			if (box.ParentBoxId is not null)
 			{
-				openedBoxes.Add(box.ParentBox);
-				boxesToPutBackOnPallet.AddRange(box.ParentBox.Boxes.Where(b => b.Id != boxId).Except(openedBoxes));
+				removedBoxes.Add(box.ParentBox);
+				newPalletBoxes.AddRange(box.ParentBox.Boxes.Where(b => b.Id != boxId).Except(removedBoxes));
 			}
 
 			box = await _boxesService.GetOneAsync(box.ParentBox.Id);
 		}
 
 		palletId = box.Pallet.Id;
-		openedBoxes.Add(box);
+		removedBoxes.Add(box);
 
-		await AddBoxesToPalletAsync(palletId, [.. boxesToPutBackOnPallet]);
-		await _boxesService.DestroyOpenedBoxesAsync([.. openedBoxes]);
+		await AddBoxesToPalletAsync(palletId, [.. newPalletBoxes]);
+		await _boxesService.RemoveBoxesAsync([.. removedBoxes]);
+	}
+
+	private async Task<List<Box>> AddBoxForRemovalAsync(Box box)
+	{
+		var boxes = new List<Box>();
+
+		while (box.Boxes is not null && box.Boxes.Count > 0)
+		{
+			boxes.AddRange(box.Boxes);
+
+			foreach (var boxToRemove in box.Boxes)
+			{
+				await AddBoxForRemovalAsync(box);
+			}
+		}
+
+		return boxes;
 	}
 
 	public async Task<List<Pallet>> GetManyAsync()
 	{
 		return await _db.Pallets.Include(p => p.Boxes).ThenInclude(b => b.Boxes).ToListAsync();
 	}
-
-	
 }

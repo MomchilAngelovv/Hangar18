@@ -64,7 +64,7 @@ public class BoxesService
 		return await _db.Boxes.ToListAsync();
 	}
 
-	public async Task DestroyOpenedBoxesAsync(params Box[] boxes)
+	public async Task RemoveBoxesAsync(params Box[] boxes)
 	{
 		_db.Boxes.RemoveRange(boxes);
 		await _db.SaveChangesAsync();

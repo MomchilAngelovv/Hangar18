@@ -38,5 +38,3 @@ while (true)
 
 	await reportsService.PrintWarehouseReportAsync();
 }
-
-
