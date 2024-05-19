@@ -107,4 +107,73 @@ public class PalletsServiceTests
 			Assert.That(allPallets.First(p => p.Id == ids[0]).Boxes.First().Id, Is.EqualTo("TestBox1"));
 		});
 	}
+
+	[Test]
+	public async Task TakeBoxAsync_Should_Only_Take_Itself_When_Empty()
+	{
+		using var _db = new Hangar18DdContext(_options);
+		var boxesService = new BoxesService(_db, _logger);
+		var _sut = new PalletsService(_db, boxesService, _logger);
+
+		var palletIds = new List<string> { "TesPallet1", "TestPallet2" };
+		var pallets = await _sut.CreatePalletsAsync(palletIds);
+
+		var boxIds = new List<string> { "TestBox1" };
+		var boxes = await boxesService.CreateBoxesAsync(boxIds);
+
+		await _sut.AddBoxesToPalletAsync(palletIds[0], [.. boxes]);
+
+		Assert.Multiple(() =>
+		{
+			Assert.That(boxes, Has.Count.EqualTo(1));
+			Assert.That(pallets, Has.Count.EqualTo(2));
+			Assert.That(pallets.First(p => p.Id == palletIds[0]).Boxes, Has.Count.EqualTo(1));
+		});
+
+		await _sut.TakeBoxAsync("TestBox1");
+
+		boxes = await _db.Boxes.ToListAsync();
+		Assert.Multiple(() =>
+		{
+			Assert.That(boxes, Has.Count.EqualTo(0));
+			Assert.That(pallets, Has.Count.EqualTo(2));
+			Assert.That(pallets.First(p => p.Id == palletIds[0]).Boxes, Has.Count.EqualTo(0));
+		});
+	}
+
+	[Test]
+	public async Task TakeBoxAsync_Should_Take_Itself_And_All_Nested_When_Have_Nested_Boxes()
+	{
+		using var _db = new Hangar18DdContext(_options);
+		var boxesService = new BoxesService(_db, _logger);
+		var _sut = new PalletsService(_db, boxesService, _logger);
+
+		var palletIds = new List<string> { "TesPallet1", "TestPallet2" };
+		var pallets = await _sut.CreatePalletsAsync(palletIds);
+
+		var boxIds = new List<string> { "TestBox1", "TestBox2" };
+		var boxes = await boxesService.CreateBoxesAsync(boxIds);
+
+		await _sut.AddBoxesToPalletAsync(palletIds[0], [boxes[0]]);
+	    await boxesService.AddBoxesToBoxAsync(boxes[0].Id, [boxes[1]]);
+
+		Assert.Multiple(() =>
+		{
+			Assert.That(boxes, Has.Count.EqualTo(2));
+			Assert.That(pallets, Has.Count.EqualTo(2));
+			Assert.That(pallets.First(p => p.Id == palletIds[0]).Boxes, Has.Count.EqualTo(1));
+			Assert.That(pallets.First(p => p.Id == palletIds[0]).Boxes.First().Boxes, Has.Count.EqualTo(1));
+		});
+
+		await _sut.TakeBoxAsync("TestBox1");
+
+		boxes = await _db.Boxes.ToListAsync();
+		Assert.Multiple(() =>
+		{
+			Assert.That(boxes, Has.Count.EqualTo(0));
+			Assert.That(pallets, Has.Count.EqualTo(2));
+			Assert.That(pallets.First(p => p.Id == palletIds[0]).Boxes, Has.Count.EqualTo(0));
+			Assert.That(boxes, Has.Count.EqualTo(0));
+		});
+	}
 }

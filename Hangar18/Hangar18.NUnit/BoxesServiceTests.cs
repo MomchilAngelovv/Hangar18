@@ -1,7 +1,6 @@
 using Hangar18.Data;
 using Hangar18.Services;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Immutable;
 
 namespace Hangar18.NUnit;
 
@@ -73,40 +72,6 @@ public class BoxesServiceTests
 			Assert.That(boxes, Has.Count.EqualTo(2));
 			Assert.That(boxes.First(p => p.Id == ids[0]).Boxes, Has.Count.EqualTo(1));
 			Assert.That(boxes.First(p => p.Id == ids[1]).ParentBoxId, Is.EqualTo("TestBox1"));
-		});
-	}
-
-	[Test]
-	public async Task TakeBoxAsync_Should_Only_Take_Itself_When_Empty()
-	{
-		using var _db = new Hangar18DdContext(_options);
-		_sut = new BoxesService(_db, _logger);
-		var palletsService = new PalletsService(_db, _sut, _logger);
-
-		var palletIds = new List<string> { "TesPallet1", "TestPallet2" };
-		var pallets = await palletsService.CreatePalletsAsync(palletIds);
-
-		var boxIds = new List<string> { "TestBox1" };
-		var boxes = await _sut.CreateBoxesAsync(boxIds);
-
-		await palletsService.AddBoxesToPalletAsync(palletIds[0], [.. boxes]);
-		//await _sut.AddBoxesToBoxAsync(boxes[0].Id, [boxes[1]]);
-
-		Assert.Multiple(() =>
-		{
-			Assert.That(boxes, Has.Count.EqualTo(1));
-			Assert.That(pallets, Has.Count.EqualTo(2));
-			Assert.That(pallets.First(p => p.Id == palletIds[0]).Boxes, Has.Count.EqualTo(1));
-		});
-
-		await palletsService.TakeBoxAsync("TestBox1");
-
-		boxes = await _db.Boxes.ToListAsync();
-		Assert.Multiple(() =>
-		{
-			Assert.That(boxes, Has.Count.EqualTo(0));
-			Assert.That(pallets, Has.Count.EqualTo(2));
-			Assert.That(pallets.First(p => p.Id == palletIds[0]).Boxes, Has.Count.EqualTo(0));
 		});
 	}
 }
