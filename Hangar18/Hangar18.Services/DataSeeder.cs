@@ -21,26 +21,37 @@ public class DataSeeder
 		_logger = logger;
 	}
 
-	/// <summary>
-	/// This will seed 2 pallets and 7 boxes 
-	/// </summary>
-	/// <returns></returns>
 	public async Task SeedDataAsync()
 	{
 		if (_db.Pallets.Any())
 		{
 			_logger.LogMessage($"Database is not empty");
 		}
-
-		for (int i = 1; i <= 7; i++)
+		
+		//TODO: at the end make it bulk operation
+		for (int i = 1; i <= 9; i++)
 		{
 		    await _boxesService.CreateBoxAsync($"Box 'BC{i}'");
 		}
 
-		for (int i = 1; i <= 2; i++)
+		for (int i = 1; i <= 3; i++)
 		{
 			await _palletsService.CreatePalletAsync($"Pallet P{i}");
 		}
+
+		var allPallets = await _palletsService.GetManyAsync();
+		var allBoxes = await _boxesService.GetManyAsync();
+
+		//Pallet 1
+		await _palletsService.AddBoxesToPalletAsync(allPallets[0].Id, allBoxes[0], allBoxes[1]);
+		await _boxesService.AddBoxesToBoxAsync(allBoxes[0].Id, allBoxes[2], allBoxes[3]);
+		await _boxesService.AddBoxesToBoxAsync(allBoxes[1].Id, allBoxes[4], allBoxes[5], allBoxes[6]);
+		await _boxesService.AddBoxesToBoxAsync(allBoxes[2].Id, allBoxes[7]);
+
+		//Palet 2
+		await _palletsService.AddBoxesToPalletAsync(allPallets[1].Id, allBoxes[8]);
+
+		//Palet 3 - empty
 
 		_logger.LogMessage($"Database seeded successfully");
 	}

@@ -19,7 +19,7 @@ public class ReportsService
 
 		foreach (var pallet in allPallets)
 		{
-            await Console.Out.WriteLineAsync($"{pallet.Id}");
+			await Console.Out.WriteLineAsync($"{pallet.Id}");
 
 			foreach (var box in pallet.Boxes)
 			{
