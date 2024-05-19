@@ -1,4 +1,5 @@
 ﻿using Hangar18.Data;
+using Hangar18.Data.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Update.Internal;
 

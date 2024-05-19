@@ -1,5 +1,4 @@
 ﻿using Hangar18.Data;
-using Hangar18.Data.Migrations;
 using Hangar18.Services;
 
 Console.WriteLine("Welcome to Hangar 18 - your warehouse from the future!");

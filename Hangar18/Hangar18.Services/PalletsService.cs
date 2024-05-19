@@ -66,8 +66,14 @@ public class PalletsService
 			return; 
 		}
 
-		box.Pallet = null;
-		await _db.SaveChangesAsync();
+		if (box.ParentBox is null && box.Pallet is not null)
+		{
+			box.Pallet = null;
+			await _db.SaveChangesAsync();
+			return;
+		}
+
+		var boxesToLeaveOnPallet = new List<Box>();
 	}
 
 	public async Task<List<Pallet>> GetManyAsync()
