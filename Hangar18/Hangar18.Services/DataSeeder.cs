@@ -29,7 +29,7 @@ public class DataSeeder
 			boxIds.Add($"Box{i}");
 		}
 
-		await _boxesService.CreateBoxesAsync(boxIds);
+		var allBoxes = await _boxesService.CreateBoxesAsync(boxIds);
 
 		var palletIds = new List<string>();
 		for (int i = 1; i <= 3; i++)
@@ -37,12 +37,9 @@ public class DataSeeder
 			palletIds.Add($"Pallet{i}");
 		}
 
-		await _palletsService.CreatePalletsAsync(palletIds);
+		var allPallets = await _palletsService.CreatePalletsAsync(palletIds);
 
-		var allPallets = await _palletsService.GetManyAsync();
-		var allBoxes = await _boxesService.GetManyAsync();
-
-		if (allBoxes.Count == 0 || allBoxes.Count == 0)
+		if (allBoxes is null || allBoxes is null)
 		{
 			_logger.LogMessage("Database is not empty. Aborting seeding");
 			return;

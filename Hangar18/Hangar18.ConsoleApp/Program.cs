@@ -17,10 +17,11 @@ await reportsService.PrintWarehouseReportAsync();
 
 while (true)
 {
+	logger.LogMessage("Please enter box ids to remove, split by ' ' (space)");
 	var input = await Console.In.ReadLineAsync();
 	if (string.IsNullOrWhiteSpace(input))
 	{
-		logger.LogMessage("Please enter box ids to remove, split by ' ' (space)");
+		logger.LogMessage("Invalid input");
 	}
 
 	if (input == "exit")
