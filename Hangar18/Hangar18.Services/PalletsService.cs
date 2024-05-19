@@ -68,6 +68,8 @@ public class PalletsService
 			return; 
 		}
 
+		_logger.LogMessage($"Removing box with Id: {boxId} and all of its nested boxes (if any) from pallet");
+
 		var removedBoxes = new List<Box>
 		{
 			box
