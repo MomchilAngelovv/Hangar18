@@ -122,7 +122,7 @@ public class PalletsService
 	}
 	private async Task PrintTakenBoxesInfoAsync(List<Box> boxes)
 	{
-		_logger.LogMessage($"Warehouse worker took boses with Ids: {string.Join(' ', boxes.Select(b => b.Id))}");
+		_logger.LogMessage($"Warehouse worker took boxes with Ids: {string.Join(' ', boxes.Select(b => b.Id))}");
 	}
 
 	public async Task<List<Pallet>> GetManyAsync()
