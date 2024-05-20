@@ -12,6 +12,8 @@ public class PalletsService
 	private readonly BoxesService _boxesService;
 	private readonly Logger _logger;
 
+	private int nestedLevelCounter = 1;
+
 	public PalletsService(
 		Hangar18DdContext db,
 		BoxesService boxesService,
@@ -72,9 +74,14 @@ public class PalletsService
 			return;
 		}
 
-		_logger.LogMessage($"Removing box with Id: {boxId} and all previous (if any) and nested (if any) boxes from pallet");
+		_logger.LogMessage($"Removing box with Id: {boxId} and all previous (if any) and nested (if any) boxes from pallet. Removed boxes:");
 
 		var removedBoxes = new List<Box>
+		{
+			box
+		};
+
+		var takenBoxes = new List<Box>
 		{
 			box
 		};
@@ -88,9 +95,11 @@ public class PalletsService
 			foreach (var boxToRemove in box.Boxes)
 			{
 				removedBoxes.AddRange(await AddBoxForRemovalAsync(boxToRemove));
+				takenBoxes.AddRange(await AddBoxForRemovalAsync(boxToRemove));
 			}
 
 			removedBoxes.AddRange(box.Boxes);
+			takenBoxes.AddRange(box.Boxes);
 		}
 
 		while (box.Pallet is null)
@@ -107,8 +116,18 @@ public class PalletsService
 		palletId = box.Pallet.Id;
 		removedBoxes.Add(box);
 
+		await PrintTakenBoxesInfoAsync(takenBoxes);
 		await AddBoxesToPalletAsync(palletId, [.. newPalletBoxes]);
 		await _boxesService.RemoveBoxesAsync([.. removedBoxes]);
+	}
+	private async Task PrintTakenBoxesInfoAsync(List<Box> boxes)
+	{
+		_logger.LogMessage($"Warehouse worker took boses with Ids: {string.Join(' ', boxes.Select(b => b.Id))}");
+	}
+
+	public async Task<List<Pallet>> GetManyAsync()
+	{
+		return await _db.Pallets.Include(p => p.Boxes).ThenInclude(b => b.Boxes).ToListAsync();
 	}
 
 	private async Task<List<Box>> AddBoxForRemovalAsync(Box box)
@@ -121,10 +140,5 @@ public class PalletsService
 		}
 
 		return boxes;
-	}
-
-	public async Task<List<Pallet>> GetManyAsync()
-	{
-		return await _db.Pallets.Include(p => p.Boxes).ThenInclude(b => b.Boxes).ToListAsync();
 	}
 }
